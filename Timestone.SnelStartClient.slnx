@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Timestone.SnelStartClient.Tests/Timestone.SnelStartClient.Tests.csproj" Id="74a138b7-8eee-4fd7-9fd5-732171bdfa23" />
+  <Project Path="Timestone.SnelStartClient/Timestone.SnelStartClient.csproj" />
+</Solution>
