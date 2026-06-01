@@ -9,9 +9,15 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: publish-nuget-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   publish:
+    name: Pack and publish
     runs-on: ubuntu-latest
+    environment: Production
 
     steps:
       - name: Checkout
@@ -22,14 +28,44 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Determine package version
+        id: version
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+
+          if [[ "$TAG" != v* ]]; then
+            echo "Release tags must start with 'v'. Received: $TAG" >&2
+            exit 1
+          fi
+
+          VERSION="${TAG#v}"
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$ ]]; then
+            echo "Invalid NuGet package version: $VERSION" >&2
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Package version: $VERSION"
+
       - name: Restore
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore -p:Version=${{ steps.version.outputs.version }} -p:ContinuousIntegrationBuild=true
 
       - name: Pack
-        run: dotnet pack --configuration Release --no-build --output ./artifacts
+        run: dotnet pack --configuration Release --no-build --output ./artifacts -p:Version=${{ steps.version.outputs.version }} -p:PackageVersion=${{ steps.version.outputs.version }} -p:ContinuousIntegrationBuild=true
+
+      - name: NuGet login
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: TimestoneBV
 
       - name: Publish to NuGet
-        run: dotnet nuget push "./artifacts/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "${{ steps.nuget-auth.outputs.api-key }}"
+        working-directory: ./artifacts
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
