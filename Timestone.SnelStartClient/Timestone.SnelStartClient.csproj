@@ -8,7 +8,7 @@
 		<IsPackable>true</IsPackable>
 
 		<PackageId>Timestone.SnelStartClient</PackageId>
-		<Version>0.1.0-preview.1</Version>
+		<Version>1.0.0</Version>
 		<Title>Timestone.SnelStartClient</Title>
 		<Authors>Timestone</Authors>
 		<Description>.NET client library for the SnelStart B2B API with repository-based access to catalog, relations, sales, purchases, banking, reporting and VAT endpoints.</Description>
