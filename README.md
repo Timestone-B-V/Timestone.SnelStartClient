@@ -9,7 +9,7 @@ De library ondersteunt naast simpele requests ook typed OData-queryopbouw voor e
 ## Installatie
 
 ```bash
-dotnet add package Timestone.SnelStartClient
+dotnet add package TimestoneNL.SnelStartClient
 ```
 
 ## Registratie via dependency injection
@@ -368,7 +368,7 @@ In addition to simple requests, the library also supports typed OData query cons
 ## Installation
 
 ```bash
-dotnet add package Timestone.SnelStartClient
+dotnet add package TimestoneNL.SnelStartClient
 ```
 
 ## Registration via dependency injection
